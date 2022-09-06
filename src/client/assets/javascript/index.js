@@ -1,7 +1,7 @@
 // PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
 
 // The store will hold all information needed globally
-let store = {
+const store = {
   track_id: undefined,
   player_id: undefined,
   race_id: undefined,
@@ -75,29 +75,33 @@ async function delay(ms) {
 
 // This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
-  //Using object destructure to get required data
-  const { player_id, track_id } = store;
+  try {
+    //Using object destructure to get required data
+    const { player_id, track_id } = store;
 
-  // const race = TODO - invoke the API call to create the race, then save the result
-  //We use await to make race variable hold the required data
-  const race = await createRace(+player_id, +track_id);
+    // const race = TODO - invoke the API call to create the race, then save the result
+    //We use await to make race variable hold the required data
+    const race = await createRace(+player_id, +track_id);
 
-  // render starting UI
-  renderAt("#race", renderRaceStartView(race.Track));
+    // render starting UI
+    renderAt("#race", renderRaceStartView(race.Track));
 
-  // For the API to work properly, the race id should be race id - 1
-  //race object hold the result of creatRace wich contains the race id now we store race id by decrmenting it by 1 for api to work properly
-  store.race_id = race.ID - 1;
+    // For the API to work properly, the race id should be race id - 1
+    //race object hold the result of creatRace wich contains the race id now we store race id by decrmenting it by 1 for api to work properly
+    store.race_id = race.ID - 1;
 
-  // The race has been created, now start the countdown
-  //Calling the count down which return a promise, so we need to use await for the count down effect to happen
-  await runCountdown();
+    // The race has been created, now start the countdown
+    //Calling the count down which return a promise, so we need to use await for the count down effect to happen
+    await runCountdown();
 
-  //Calling the startRace
-  await startRace(+store.race_id);
+    //Calling the startRace
+    await startRace(+store.race_id);
 
-  //Calling the runRace and pass the updated race id
-  runRace(+store.race_id);
+    //Calling the runRace and pass the updated race id
+    runRace(+store.race_id);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function runRace(raceID) {
@@ -280,7 +284,7 @@ function resultsView(positions) {
 }
 
 function raceProgress(positions) {
-  let userPlayer = positions.find((e) => e.id === store.player_id);
+  const userPlayer = positions.find((e) => e.id === store.player_id);
   userPlayer.driver_name += " (you)";
 
   positions = positions.sort((a, b) => (a.segment > b.segment ? -1 : 1));
